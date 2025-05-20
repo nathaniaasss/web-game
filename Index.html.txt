@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorium Virtual Asam Basa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #1e88e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .info-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lab-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .lab-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sample-selector, .indicator-selector {
+            margin-bottom: 20px;
+        }
+        
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #388e3c;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .test-tube {
+            width: 80px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 20px 20px;
+            border: 2px solid #888;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .liquid {
+            width: 100%;
+            height: 80%;
+            position: absolute;
+            bottom: 0;
+            transition: background-color 1s;
+            background-color: transparent;
+        }
+        
+        .bubbles {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80%;
+            display: none;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubbleRise 3s infinite;
+        }
+        
+        @keyframes bubbleRise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-150px) scale(0.5);
+                opacity: 0;
+            }
+        }
+        
+        .result-text {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e1f5fe;
+            border-radius: 5px;
+            border-left: 5px solid #03a9f4;
+        }
+        
+        .ph-scale {
+            margin: 20px 0;
+            height: 40px;
+            background: linear-gradient(to right, #ff0000, #ff5e00, #ffbb00, #ffff00, #a5ff00, #00ff00, #00ff9d, #00d0ff, #0080ff, #0000ff, #8000ff, #ff00ff);
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .ph-marker {
+            position: absolute;
+            width: 4px;
+            height: 50px;
+            background-color: black;
+            top: -5px;
+            transition: left 1s;
+            display: none;
+        }
+        
+        .ph-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        .ph-value {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .ph-marker-value {
+            position: absolute;
+            top: -25px;
+            left: -10px;
+            background-color: #333;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Laboratorium Virtual Asam Basa</h1>
+            <p>Selamat datang di Lab Virtual! Mari belajar konsep asam dan basa dengan melakukan percobaan menggunakan indikator alami.</p>
+        </header>
+        
+        <div class="info-box">
+            <h2>Materi Asam dan Basa</h2>
+            <p>Dalam kimia, asam dan basa adalah dua jenis senyawa yang memiliki sifat berbeda:</p>
+            <ul>
+                <li><strong>Asam:</strong> Memiliki pH kurang dari 7, rasanya masam, dan dapat melepaskan ion H⁺</li>
+                <li><strong>Basa:</strong> Memiliki pH lebih dari 7, rasanya pahit, dan dapat melepaskan ion OH⁻</li>
+                <li><strong>Netral:</strong> Memiliki pH sekitar 7, seperti air murni</li>
+            </ul>
+            
+            <h3>Skala pH</h3>
+            <div class="ph-scale">
+                <div class="ph-marker">
+                    <div class="ph-marker-value">7</div>
+                </div>
+            </div>
+            <div class="ph-scale-labels">
+                <span class="ph-value">0</span>
+                <span class="ph-value">1</span>
+                <span class="ph-value">2</span>
+                <span class="ph-value">3</span>
+                <span class="ph-value">4</span>
+                <span class="ph-value">5</span>
+                <span class="ph-value">6</span>
+                <span class="ph-value">7</span>
+                <span class="ph-value">8</span>
+                <span class="ph-value">9</span>
+                <span class="ph-value">10</span>
+                <span class="ph-value">11</span>
+                <span class="ph-value">12</span>
+                <span class="ph-value">13</span>
+                <span class="ph-value">14</span>
+            </div>
+            
+            <h3>Indikator Alami</h3>
+            <p>Indikator alami adalah zat yang dapat berubah warna tergantung pada pH lingkungannya. Banyak tanaman dan buah-buahan mengandung senyawa yang dapat berfungsi sebagai indikator alami.</p>
+            
+            <table>
+                <tr>
+                    <th>Indikator Alami</th>
+                    <th>Warna dalam Asam</th>
+                    <th>Warna dalam Basa</th>
+                </tr>
+                <tr>
+                    <td>Kol Merah</td>
+                    <td>Merah</td>
+                    <td>Biru / Hijau</td>
+                </tr>
+                <tr>
+                    <td>Bunga Sepatu</td>
+                    <td>Merah Muda</td>
+                    <td>Hijau Kebiruan</td>
+                </tr>
+                <tr>
+                    <td>Kunyit</td>
+                    <td>Kuning</td>
+                    <td>Merah Kecoklatan</td>
+                </tr>
+                <tr>
+                    <td>Teh</td>
+                    <td>Merah Kecoklatan</td>
+                    <td>Hitam Kehijauan</td>
+                </tr>
+                <tr>
+                    <td>Bunga Telang</td>
+                    <td>Merah Keunguan</td>
+                    <td>Biru</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="lab-container">
+            <div class="lab-panel">
+                <h2>Peralatan Laboratorium</h2>
+                
+                <div class="sample-selector">
+                    <label for="sample">Pilih Larutan Sampel:</label>
+                    <select id="sample">
+                        <option value="">-- Pilih Larutan --</option>
+                        <option value="hcl">Asam Klorida (HCl)</option>
+                        <option value="vinegar">Cuka Dapur (CH₃COOH)</option>
+                        <option value="lemon">Air Jeruk Lemon</option>
+                        <option value="soda">Minuman Bersoda</option>
+                        <option value="water">Air Mineral</option>
+                        <option value="naoh">Natrium Hidroksida (NaOH)</option>
+                        <option value="soap">Air Sabun</option>
+                        <option value="ammonia">Amonia (NH₃)</option>
+                        <option value="bakingsoda">Baking Soda (NaHCO₃)</option>
+                        <option value="milk">Susu</option>
+                    </select>
+                </div>
+                
+                <div class="indicator-selector">
+                    <label for="indicator">Pilih Indikator Alami:</label>
+                    <select id="indicator">
+                        <option value="">-- Pilih Indikator --</option>
+                        <option value="redcabbage">Ekstrak Kol Merah</option>
+                        <option value="turmeric">Ekstrak Kunyit</option>
+                        <option value="hibiscus">Ekstrak Bunga Sepatu</option>
+                        <option value="tea">Ekstrak Teh</option>
+                        <option value="butterfly">Ekstrak Bunga Telang</option>
+                        <option value="beetroot">Ekstrak Bit Merah</option>
+                        <option value="blackberry">Ekstrak Blackberry</option>
+                        <option value="cherry">Ekstrak Ceri</option>
+                    </select>
+                </div>
+                
+                <button id="test-button" disabled>Uji Larutan</button>
+            </div>
+            
+            <div class="lab-panel">
+                <h2>Hasil Pengujian</h2>
+                
+                <div class="result-container">
+                    <div class="test-tube">
+                        <div class="liquid"></div>
+                        <div class="bubbles"></div>
+                    </div>
+                    <div class="result-text">Pilih larutan dan indikator untuk memulai pengujian</div>
+                    <div class="explanation hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data sampel larutan
+        const samples = {
+            "hcl": {
+                name: "Asam Klorida (HCl)",
+                pH: 1,
+                type: "asam kuat",
+                description: "Asam klorida adalah asam kuat yang biasa digunakan di laboratorium. HCl melepaskan ion H⁺ ketika dilarutkan dalam air."
+            },
+            "vinegar": {
+                name: "Cuka Dapur (CH₃COOH)",
+                pH: 3,
+                type: "asam lemah",
+                description: "Cuka dapur mengandung asam asetat yang merupakan asam lemah dengan pH sekitar 3. Banyak digunakan dalam masakan."
+            },
+            "lemon": {
+                name: "Air Jeruk Lemon",
+                pH: 2.5,
+                type: "asam lemah",
+                description: "Air jeruk lemon mengandung asam sitrat yang memberikan rasa asam pada buah-buahan jeruk."
+            },
+            "soda": {
+                name: "Minuman Bersoda",
+                pH: 3.5,
+                type: "asam lemah",
+                description: "Minuman bersoda mengandung asam karbonat yang terbentuk dari karbondioksida terlarut."
+            },
+            "water": {
+                name: "Air Mineral",
+                pH: 7,
+                type: "netral",
+                description: "Air murni memiliki pH netral yaitu 7. Tidak bersifat asam maupun basa."
+            },
+            "naoh": {
+                name: "Natrium Hidroksida (NaOH)",
+                pH: 13,
+                type: "basa kuat",
+                description: "NaOH adalah basa kuat yang biasa digunakan di laboratorium. NaOH melepaskan ion OH⁻ ketika dilarutkan dalam air."
+            },
+            "soap": {
+                name: "Air Sabun",
+                pH: 10,
+                type: "basa lemah",
+                description: "Sabun biasanya bersifat basa karena dibuat dengan melarutkan basa dengan lemak atau minyak."
+            },
+            "ammonia": {
+                name: "Amonia (NH₃)",
+                pH: 11,
+                type: "basa lemah",
+                description: "Amonia adalah basa lemah yang biasa digunakan dalam produk pembersih rumah tangga."
+            },
+            "bakingsoda": {
+                name: "Baking Soda (NaHCO₃)",
+                pH: 9,
+                type: "basa lemah",
+                description: "Baking soda atau natrium bikarbonat adalah basa lemah yang biasa digunakan dalam pembuatan kue."
+            },
+            "milk": {
+                name: "Susu",
+                pH: 6.5,
+                type: "sedikit asam",
+                description: "Susu segar biasanya sedikit asam dengan pH sekitar 6.5 karena mengandung asam laktat."
+            }
+        };
+        
+        // Data indikator alami
+        const indicators = {
+            "redcabbage": {
+                name: "Ekstrak Kol Merah",
+                acidColor: "#ff0066",
+                neutralColor: "#9966ff",
+                baseColor: "#66cc66",
+                acidDescription: "Kol merah mengandung antosianin yang berubah menjadi merah dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, antosianin kol merah berubah menjadi hijau hingga kuning.",
+                neutralDescription: "Dalam larutan netral, ekstrak kol merah berwarna ungu."
+            },
+            "turmeric": {
+                name: "Ekstrak Kunyit",
+                acidColor: "#ffcc00",
+                neutralColor: "#ffcc00",
+                baseColor: "#cc3300",
+                acidDescription: "Kunyit mengandung kurkumin yang berwarna kuning cerah dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, kurkumin berubah menjadi merah kecoklatan.",
+                neutralDescription: "Dalam larutan netral, ekstrak kunyit tetap berwarna kuning."
+            },
+            "hibiscus": {
+                name: "Ekstrak Bunga Sepatu",
+                acidColor: "#ff3399",
+                neutralColor: "#cc6699",
+                baseColor: "#009966",
+                acidDescription: "Bunga sepatu mengandung antosianin yang berwarna merah muda dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, antosianin bunga sepatu berubah menjadi hijau kebiruan.",
+                neutralDescription: "Dalam larutan netral, ekstrak bunga sepatu berwarna merah keunguan."
+            },
+            "tea": {
+                name: "Ekstrak Teh",
+                acidColor: "#993300",
+                neutralColor: "#663300",
+                baseColor: "#003300",
+                acidDescription: "Teh mengandung tanin yang berubah menjadi merah kecoklatan dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, tanin berubah menjadi hitam kehijauan.",
+                neutralDescription: "Dalam larutan netral, ekstrak teh berwarna coklat tua."
+            },
+            "butterfly": {
+                name: "Ekstrak Bunga Telang",
+                acidColor: "#ff3366",
+                neutralColor: "#3333cc",
+                baseColor: "#0066cc",
+                acidDescription: "Bunga telang mengandung antosianin yang berubah menjadi merah keunguan dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, antosianin bunga telang menghasilkan warna biru cerah.",
+                neutralDescription: "Dalam larutan netral, ekstrak bunga telang berwarna biru."
+            },
+            "beetroot": {
+                name: "Ekstrak Bit Merah",
+                acidColor: "#cc0033",
+                neutralColor: "#990033",
+                baseColor: "#660033",
+                acidDescription: "Bit merah mengandung betanin yang berwarna merah cerah dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, betanin berubah menjadi ungu gelap.",
+                neutralDescription: "Dalam larutan netral, ekstrak bit merah berwarna merah marun."
+            },
+            "blackberry": {
+                name: "Ekstrak Blackberry",
+                acidColor: "#cc0066",
+                neutralColor: "#660066",
+                baseColor: "#009933",
+                acidDescription: "Blackberry mengandung antosianin yang berwarna merah dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, antosianin blackberry berubah menjadi hijau kebiruan.",
+                neutralDescription: "Dalam larutan netral, ekstrak blackberry berwarna ungu gelap."
+            },
+            "cherry": {
+                name: "Ekstrak Ceri",
+                acidColor: "#ff0033",
+                neutralColor: "#cc3366",
+                baseColor: "#6600cc",
+                acidDescription: "Ceri mengandung antosianin yang berwarna merah cerah dalam larutan asam.",
+                baseDescription: "Dalam larutan basa, antosianin ceri berubah menjadi ungu tua hingga biru.",
+                neutralDescription: "Dalam larutan netral, ekstrak ceri berwarna merah keunguan."
+            }
+        };
+        
+        // Mengambil elemen-elemen
+        const sampleSelect = document.getElementById('sample');
+        const indicatorSelect = document.getElementById('indicator');
+        const testButton = document.getElementById('test-button');
+        const liquid = document.querySelector('.liquid');
+        const bubbles = document.querySelector('.bubbles');
+        const resultText = document.querySelector('.result-text');
+        const explanation = document.querySelector('.explanation');
+        const phMarker = document.querySelector('.ph-marker');
+        const testTube = document.querySelector('.test-tube');
+        
+        // Membuat gelembung secara acak
+        function createBubbles() {
+            bubbles.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                bubble.style.width = Math.random() * 10 + 5 + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.left = Math.random() * 80 + '%';
+                bubble.style.animationDelay = Math.random() * 3 + 's';
+                bubbles.appendChild(bubble);
+            }
+        }
+        
+        createBubbles();
+        
+        // Mengaktifkan/menonaktifkan tombol uji
+        function updateButtonState() {
+            testButton.disabled = !sampleSelect.value || !indicatorSelect.value;
+        }
+        
+        sampleSelect.addEventListener('change', updateButtonState);
+        indicatorSelect.addEventListener('change', updateButtonState);
+        
+        // Fungsi untuk memperbarui posisi marker pH
+        function updatePhMarker(ph) {
+            const position = (ph / 14) * 100;
+            phMarker.style.left = `${position}%`;
+            phMarker.querySelector('.ph-marker-value').textContent = ph;
+            phMarker.style.display = 'block';
+        }
+        
+        // Fungsi untuk menguji larutan
+        testButton.addEventListener('click', function() {
+            const selectedSample = sampleSelect.value;
+            const selectedIndicator = indicatorSelect.value;
+            
+            // Animasi mengocok
+            testTube.classList.add('shake');
+            setTimeout(() => {
+                testTube.classList.remove('shake');
+            }, 500);
+            
+            // Tampilkan gelembung
+            bubbles.style.display = 'block';
+            
+            if (selectedSample && selectedIndicator) {
+                const sample = samples[selectedSample];
+                const indicator = indicators[selectedIndicator];
+                
+                // Tentukan warna berdasarkan pH
+                let resultColor;
+                let resultDescription;
+                let sifat;
+                
+                if (sample.pH < 7) {
+                    resultColor = indicator.acidColor;
+                    resultDescription = indicator.acidDescription;
+                    sifat = "asam";
+                } else if (sample.pH > 7) {
+                    resultColor = indicator.baseColor;
+                    resultDescription = indicator.baseDescription;
+                    sifat = "basa";
+                } else {
+                    resultColor = indicator.neutralColor;
+                    resultDescription = indicator.neutralDescription;
+                    sifat = "netral";
+                }
+                
+                // Animasi perubahan warna
+                setTimeout(() => {
+                    liquid.style.backgroundColor = resultColor;
+                    resultText.textContent = `${sample.name} bersifat ${sifat} (pH ${sample.pH})`;
+                    explanation.innerHTML = `
+                        <h3>Penjelasan Ilmiah:</h3>
+                        <p>${sample.description}</p>
+                        <p>${resultDescription}</p>
+                        <p>Ketika ${indicator.name} ditambahkan ke ${sample.name}, larutan berubah warna menjadi ${getColorName(resultColor)} karena ${sample.type} memiliki pH ${sample.pH}.</p>
+                    `;
+                    explanation.classList.remove('hidden');
+                    
+                    // Perbarui marker pH
+                    updatePhMarker(sample.pH);
+                }, 1000);
+            }
+        });
+        
+        // Fungsi helper untuk mendapatkan nama warna dari kode HEX
+        function getColorName(hexColor) {
+            const colorMap = {
+                "#ff0066": "merah muda",
+                "#9966ff": "ungu",
+                "#66cc66": "hijau",
+                "#ffcc00": "kuning",
+                "#cc3300": "merah kecoklatan",
+                "#ff3399": "merah muda",
+                "#cc6699": "ungu kemerahan",
+                "#009966": "hijau kebiruan",
+                "#993300": "coklat kemerahan",
+                "#663300": "coklat tua",
+                "#003300": "hijau gelap",
+                "#ff3366": "merah keunguan",
+                "#3333cc": "biru",
+                "#0066cc": "biru cerah",
+                "#cc0033": "merah cerah",
+                "#990033": "merah marun",
+                "#660033": "ungu gelap",
+                "#cc0066": "merah keunguan",
+                "#660066": "ungu tua",
+                "#009933": "hijau",
+                "#ff0033": "merah",
+                "#cc3366": "merah keunguan",
+                "#6600cc": "ungu"
+            };
+            
+            return colorMap[hexColor] || "berwarna";
+        }
+    </script>
+</body>
+</html>
